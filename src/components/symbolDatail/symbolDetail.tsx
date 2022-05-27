@@ -14,7 +14,7 @@ interface Props {
 }
 
 // main component 
-const Task:React.FC<Props> = ({ title, priority, done, id }) => {
+const SymbolDetail:React.FC<Props> = ({ title, priority, done, id }) => {
     const [priorityClassName, setPriorityClassName] = useState(Styles.high);
     // redux
     const dispatch = useDispatch();
@@ -100,4 +100,4 @@ const Task:React.FC<Props> = ({ title, priority, done, id }) => {
     );
 };
 
-export default Task;
+export default SymbolDetail;

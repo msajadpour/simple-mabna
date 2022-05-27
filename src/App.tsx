@@ -1,4 +1,3 @@
-//pages
 import Pages from "./pages";
 
 //Main Component

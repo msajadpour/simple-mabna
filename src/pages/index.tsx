@@ -1,5 +1,8 @@
 import * as React from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Header from '../components/header/header';
 import SymbolsList from './sybmolsList/sybmolsList';
 import SymbolDetail from './symbolDetail/symbolDetail';
@@ -20,6 +23,10 @@ const Pages:React.FC = () => {
                     <SymbolsList />
                 </Route>
             </Switch>
+            <ToastContainer
+            position='top-left'
+            rtl={true}
+            />
         </Router>
     )
 }

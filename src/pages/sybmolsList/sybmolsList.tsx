@@ -1,69 +1,79 @@
 import React, { useCallback, useState } from "react";
 import { useEffect } from "react";
 // packages
-import axios from "axios";
 import { FixedSizeList as List } from "react-window";
+import { Link } from "react-router-dom";
 // redux
 import { useDispatch, useSelector } from "react-redux";
 import { uiActions } from "../../features/ui/uiSlice";
+import { dataActions } from "../../features/data/dataSlice";
 // styles
 import Styles from "./sybmolsList.module.scss";
+
+import { getApiResult } from "../../features/api/services";
+import { handlePriceSeprator } from "../../features/heplers/handlePriceSeprator";
 import Loader from "../../components/loader/loader";
-import { Link } from "react-router-dom";
 import Card from "../../components/base/card/card";
 
 // main component
 const SymbolsList = () => {
-    // const[data , setData] = useState<any>([])
-    // base url
-    const API_URL = process.env.REACT_APP_API_URL;
-
     // redux
     const dispatch = useDispatch();
-    let sybmolsList = useSelector((store: any) => store.ui.counter);
+    let sybmolsList = useSelector((store: any) => store.dataStore.symbolNames);
+    let trades = useSelector((store: any) => store.dataStore.trade);
     let loading = useSelector((store: any) => store.ui.loading);
 
     useEffect(() => {
-        handleGetTasks();
-        // setData(dates)
+        if(!(sybmolsList.length > 0 || trades.length > 0)) { // if data exist api will not be called
+            handleGetSymbolsList();
+        }
     }, []);
 
 
     // handlers
-    const handleGetTasks = async () => {
-        dispatch(uiActions.setLoading(true));
-        try {
-            const res = await axios.get(
-                `${API_URL}assets`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            dispatch(uiActions.setLoading(false));
-            // to generate id for any task in array
-            dispatch(uiActions.setCounter(res.data.data))
-        } catch (err) {
-            console.log(err);
+    const handleModelsFields = (symbolsList:[] , tradesList:[]) => {
+        let filteredSymbolsList = symbolsList.map((symbol:any) => ({id:symbol.id , title:symbol.value.title , trade_symbol:symbol.value.trade_symbol }))
+        let filteredTradesList = tradesList.map((symbol:any) => ({close_price:handlePriceSeprator(symbol.value.close_price) , value:handlePriceSeprator(symbol.value.value) }))
+        for(let i = 0 ; i < symbolsList.length ; i++){
+            filteredSymbolsList[i] = {...filteredSymbolsList[i] , ...filteredTradesList[i]}
         }
+        return filteredSymbolsList
+    }
+    const handleGetSymbolsList = async () => {
+        dispatch(uiActions.setLoading(true));
+
+        let symbolsList = await getApiResult("assets")
+        let tradesList = await getApiResult("trades")
+        let filteredSymbolList = handleModelsFields(symbolsList , tradesList) // optimize data model to render jsx
+
+        dispatch(dataActions.setData(filteredSymbolList)) // to render main list
+        dispatch(dataActions.setTrade(tradesList)) // save trades data in appStore to use in another page(.../Detail/id)
+        dispatch(uiActions.setLoading(false)); // 
     };
+
+
+// ====================handling virtual rendering models===================================\\ 
     const data = sybmolsList ? sybmolsList.map((symbol: any) => (({
-        trade_symbol: symbol.value.trade_symbol,
-        title: symbol.value.title,
+        trade_symbol: symbol.trade_symbol,
+        title: symbol.title,
+        close_price:symbol.close_price,
+        value: symbol.value,
         id: symbol.id,
     }))) : []
-    const Row = useCallback(({ index, key, style }: any) => (
+
+    // row to render in react-window component for virtual render
+    const Row = ({ index, key, style }: any) => (
         <li className="row flex-start" key={data[index.id]} style={style}>
             <div className={`col-2 ${Styles.ellipsis}`}><p><Link to={`Detail/${data[index].id}`}> {data[index].trade_symbol}</Link></p> </div>
             <div className={`col-6 col-md-4 ${Styles.ellipsis}`}><p>{data[index].title}</p> </div>
-            <div className={`col-2 ${Styles.ellipsis}`}><p>{"133,500"}</p> </div>
-            <div className={`col-2 ${Styles.ellipsis}`}><p>125,000</p> </div>
+            <div className={`col-2 ${Styles.ellipsis}`}><p>{data[index].close_price}</p> </div>
+            <div className={`col-2 ${Styles.ellipsis}`}><p>{data[index].value}</p> </div>
         </li>
-    ), [sybmolsList])
+    )
+// ====================handling virtual rendering models===================================\\ 
     return (
         <React.Fragment>
-            <div className={Styles.main}>
+            <div className={Styles.main} onClick={()=> dispatch(uiActions.setShowSearchBox(false))}>
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-12">

@@ -7,6 +7,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     .inner{
         width: 100%;
         display: flex;
@@ -25,7 +26,31 @@
             display: flex;
             align-items: center;
             align-content: flex-start;
-
+            .result{
+                position: absolute;
+                right: 0;
+                top: 4.2rem;
+                background: #fff;
+                color: #1e222d;
+                width: 79% !important;
+                z-index: 999;
+                border: 1px solid rgb(226, 223, 223);
+                border-radius: 10px;
+                padding: 1.5rem;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+                .row{
+                    border-bottom: .1px solid lightgray;
+                    cursor: pointer;
+                }
+                p:nth-child(1){
+                    color: black !important;
+                    font-size: 1.6rem;
+                }
+                p:nth-child(2){
+                    color: gray;
+                    font-size: 1.2rem;
+                }
+            }
             input[type="text"]{
                 width: 79%;
                 height: 4rem;
@@ -39,11 +64,17 @@
                 &::placeholder{
                     color: #fff;
                 }
+
             }
             svg{
                 position: absolute;
                 right: 1.2rem;
             }
         }
+    }
+}
+.ScrollHidden { 
+    & > div::-webkit-scrollbar{
+        display: none;
     }
 }

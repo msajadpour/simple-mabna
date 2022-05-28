@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
     loading: false,
-    counter : null,
+    showSearchBox : false,
 }
 
 export const uiSlice = createSlice({
@@ -12,8 +12,8 @@ export const uiSlice = createSlice({
         setLoading: (state, action) => {
             state.loading = action.payload;
         },
-        setCounter: (state, action) => {
-            state.counter = action.payload;
+        setShowSearchBox: (state, action) => {
+            state.showSearchBox = action.payload;
         }
     }
 })
